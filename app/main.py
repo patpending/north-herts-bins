@@ -277,6 +277,53 @@ async def get_next_collection(
         raise HTTPException(status_code=404, detail="No upcoming collections found")
 
 
+class NextCollectionSensor(BaseModel):
+    """Simple format for Home Assistant sensor."""
+    state: str = Field(description="Next bin type")
+    days: int = Field(description="Days until collection")
+    date: str = Field(description="Collection date")
+
+
+@app.get("/api/sensor/next", response_model=NextCollectionSensor)
+async def next_collection_sensor(
+    uprn: Optional[str] = Query(None, description="Property UPRN"),
+    postcode: Optional[str] = Query(None, description="UK postcode"),
+    house_number: Optional[str] = Query(None, description="House number or name")
+):
+    """
+    Simple next collection sensor for Home Assistant.
+
+    Returns just the essentials: bin type, days until, and date.
+
+    Example Home Assistant configuration:
+    ```yaml
+    sensor:
+      - platform: rest
+        name: "Next Bin"
+        resource: "http://localhost:8000/api/sensor/next?uprn=010070035296"
+        value_template: "{{ value_json.state }}"
+        json_attributes:
+          - days
+          - date
+    ```
+    """
+    collections_data = await get_collections(uprn, postcode, house_number)
+    next_coll = collections_data.get("next_collection")
+
+    if next_coll:
+        return {
+            "state": next_coll["bin_type"],
+            "days": next_coll["days_until"],
+            "date": next_coll["collection_date_formatted"]
+        }
+    else:
+        return {
+            "state": "None",
+            "days": -1,
+            "date": "N/A"
+        }
+
+
 @app.get("/api/health")
 async def health_check():
     """Health check endpoint for monitoring."""

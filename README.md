@@ -42,6 +42,31 @@ This service provides a REST API specifically designed for Home Assistant integr
 
 Add the following to your `configuration.yaml`:
 
+### Option A: Simple Next Bin Sensor (Recommended)
+
+Returns only the next bin collection - clean and simple:
+
+```yaml
+sensor:
+  - platform: rest
+    name: "Next Bin"
+    resource: "http://localhost:8000/api/sensor/next?uprn=010070035296"
+    value_template: "{{ value_json.state }}"
+    json_attributes:
+      - days
+      - date
+    scan_interval: 3600
+```
+
+This gives you:
+- `sensor.next_bin` = "Mixed recycling bin"
+- `state_attr('sensor.next_bin', 'days')` = 3
+- `state_attr('sensor.next_bin', 'date')` = "Tuesday, 20 January 2026"
+
+### Option B: Full Collection Data
+
+If you want all upcoming collections:
+
 ```yaml
 sensor:
   - platform: rest
@@ -53,7 +78,7 @@ sensor:
       - days_until
       - next_date
       - collections
-    scan_interval: 3600  # Update every hour
+    scan_interval: 3600
 ```
 
 After adding this, restart Home Assistant or reload the YAML configuration.
@@ -308,9 +333,10 @@ script:
 
 | Endpoint | Description |
 |----------|-------------|
-| `GET /api/homeassistant?uprn=XXXXX` | Home Assistant formatted response |
-| `GET /api/collections?uprn=XXXXX` | Full collection data |
-| `GET /api/next?uprn=XXXXX` | Next collection only |
+| `GET /api/sensor/next?uprn=XXXXX` | Simple next bin sensor (recommended for HA) |
+| `GET /api/homeassistant?uprn=XXXXX` | Full Home Assistant formatted response |
+| `GET /api/collections?uprn=XXXXX` | All collection data |
+| `GET /api/next?uprn=XXXXX` | Next collection (detailed) |
 | `GET /api/health` | Service health check |
 | `GET /docs` | Swagger API documentation |
 
