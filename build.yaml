@@ -1,0 +1,9 @@
+# Build configuration for Home Assistant Add-on
+# https://developers.home-assistant.io/docs/add-ons/configuration#add-on-extended-build
+
+build_from:
+  aarch64: ghcr.io/hassio-addons/base:15.0.8
+  amd64: ghcr.io/hassio-addons/base:15.0.8
+  armhf: ghcr.io/hassio-addons/base:15.0.8
+  armv7: ghcr.io/hassio-addons/base:15.0.8
+  i386: ghcr.io/hassio-addons/base:15.0.8
