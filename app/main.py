@@ -283,6 +283,7 @@ class NextCollectionSensor(BaseModel):
     state: str = Field(description="Next bin type")
     days: int = Field(description="Days until collection")
     date: str = Field(description="Collection date")
+    last_updated: str = Field(description="Timestamp of last data fetch")
 
 
 @app.get("/api/sensor/next", response_model=NextCollectionSensor)
@@ -315,13 +316,15 @@ async def next_collection_sensor(
         return {
             "state": next_coll["bin_type"],
             "days": next_coll["days_until"],
-            "date": next_coll["collection_date_formatted"]
+            "date": next_coll["collection_date_formatted"],
+            "last_updated": datetime.now().isoformat()
         }
     else:
         return {
             "state": "None",
             "days": -1,
-            "date": "N/A"
+            "date": "N/A",
+            "last_updated": datetime.now().isoformat()
         }
 
 

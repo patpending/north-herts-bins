@@ -3,7 +3,7 @@
 
 name: "North Herts Bin Collection"
 description: "Bin collection schedule for North Hertfordshire"
-version: "1.0.1"
+version: "1.0.2"
 slug: "north_herts_bins"
 url: "https://github.com/patpending/north-herts-bins"
 arch:
