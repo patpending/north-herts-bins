@@ -1,20 +1,23 @@
-#!/usr/bin/with-contenv bashio
-# Home Assistant Add-on run script
-
+#!/bin/sh
 set -e
 
-# Read configuration from Home Assistant add-on options
-UPRN=$(bashio::config 'uprn')
-CACHE_TTL=$(bashio::config 'cache_ttl')
+# Read config from options.json
+CONFIG_PATH="/data/options.json"
 
-bashio::log.info "Starting North Herts Bin Collection service..."
-bashio::log.info "UPRN: ${UPRN}"
-bashio::log.info "Cache TTL: ${CACHE_TTL}s"
+if [ -f "$CONFIG_PATH" ]; then
+    UPRN=$(cat "$CONFIG_PATH" | python3 -c "import sys,json; print(json.load(sys.stdin).get('uprn','010070035296'))")
+    CACHE_TTL=$(cat "$CONFIG_PATH" | python3 -c "import sys,json; print(json.load(sys.stdin).get('cache_ttl',3600))")
+else
+    UPRN="010070035296"
+    CACHE_TTL="3600"
+fi
 
-# Export environment variables for the app
+echo "Starting North Herts Bin Collection..."
+echo "UPRN: ${UPRN}"
+echo "Cache TTL: ${CACHE_TTL}s"
+
 export DEFAULT_UPRN="${UPRN}"
 export CACHE_TTL_SECONDS="${CACHE_TTL}"
 
-# Start the FastAPI server
 cd /app
 exec python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000
