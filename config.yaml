@@ -1,0 +1,34 @@
+# Home Assistant Add-on Configuration
+# https://developers.home-assistant.io/docs/add-ons/configuration
+
+name: "North Herts Bin Collection"
+description: "Bin collection schedule for North Hertfordshire"
+version: "1.0.0"
+slug: "north_herts_bins"
+url: "https://github.com/patpending/north-herts-bins"
+arch:
+  - amd64
+  - aarch64
+  - armv7
+  - armhf
+  - i386
+startup: application
+boot: auto
+init: false
+homeassistant_api: false
+host_network: false
+ports:
+  8000/tcp: 8000
+ports_description:
+  8000/tcp: "Web UI and API"
+map:
+  - config:rw
+options:
+  uprn: "010070035296"
+  cache_ttl: 3600
+schema:
+  uprn: str
+  cache_ttl: int(60,86400)?
+webui: "http://[HOST]:[PORT:8000]"
+panel_icon: "mdi:trash-can"
+panel_title: "Bin Collection"

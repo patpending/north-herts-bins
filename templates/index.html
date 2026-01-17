@@ -309,14 +309,34 @@
     <script>
         const API_BASE = '/api';
 
-        // Default address (hardcoded)
-        const DEFAULT_ADDRESS = {
-            uprn: '010070035296',
-            address: 'The Dell Barn, Tile Kiln Farm, Weston Road, Hitchin, Hertfordshire SG4 7BS'
+        // Default address (loaded from server config)
+        let DEFAULT_ADDRESS = {
+            uprn: null,
+            address: 'Loading...'
         };
 
         // Check for saved UPRN on load
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Load default config from server
+            try {
+                const response = await fetch(`${API_BASE}/config`);
+                const config = await response.json();
+                DEFAULT_ADDRESS.uprn = config.default_uprn;
+
+                // Try to get the address details
+                const collections = await fetch(`${API_BASE}/collections?uprn=${config.default_uprn}`);
+                const data = await collections.json();
+                if (data.address) {
+                    DEFAULT_ADDRESS.address = data.address;
+                } else {
+                    DEFAULT_ADDRESS.address = `UPRN: ${config.default_uprn}`;
+                }
+            } catch (e) {
+                console.error('Failed to load config:', e);
+                DEFAULT_ADDRESS.uprn = '010070035296';
+                DEFAULT_ADDRESS.address = 'The Dell Barn (default)';
+            }
+
             // Auto-load default address
             showSavedAddress(DEFAULT_ADDRESS.address);
             loadCollections(DEFAULT_ADDRESS.uprn);

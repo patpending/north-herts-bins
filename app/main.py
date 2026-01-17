@@ -24,6 +24,7 @@ from .scraper import (
 
 # Configuration
 CACHE_TTL_SECONDS = int(os.getenv("CACHE_TTL_SECONDS", "3600"))  # 1 hour default
+DEFAULT_UPRN = os.getenv("DEFAULT_UPRN", "010070035296")
 
 
 # Simple in-memory cache
@@ -322,6 +323,12 @@ async def next_collection_sensor(
             "days": -1,
             "date": "N/A"
         }
+
+
+@app.get("/api/config")
+async def get_config():
+    """Get the default configuration."""
+    return {"default_uprn": DEFAULT_UPRN}
 
 
 @app.get("/api/health")
