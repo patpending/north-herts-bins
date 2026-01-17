@@ -25,6 +25,18 @@ docker build -t north-herts-bins .
 docker run -d -p 8000:8000 --name north-herts-bins north-herts-bins
 ```
 
+### Running on Home Assistant Server
+
+For detailed instructions on running this alongside Home Assistant, see:
+**[docs/HOMEASSISTANT_DOCKER.md](docs/HOMEASSISTANT_DOCKER.md)**
+
+Quick start for HA Docker installations:
+```bash
+git clone https://github.com/patpending/north-herts-bins.git
+cd north-herts-bins
+docker-compose -f docker-compose.homeassistant.yml up -d
+```
+
 ---
 
 # Home Assistant Integration

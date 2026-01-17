@@ -1,0 +1,35 @@
+# Docker Compose for running alongside Home Assistant
+#
+# Usage:
+#   docker-compose -f docker-compose.homeassistant.yml up -d
+#
+# This configuration is designed for Home Assistant Docker installations.
+# See docs/HOMEASSISTANT_DOCKER.md for full instructions.
+
+version: "3.8"
+
+services:
+  north-herts-bins:
+    build: .
+    container_name: north-herts-bins
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - TZ=Europe/London
+      - CACHE_TTL_SECONDS=3600
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 5m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    # Uncomment below to use the same network as Home Assistant
+    # networks:
+    #   - homeassistant
+
+# Uncomment to share network with Home Assistant
+# networks:
+#   homeassistant:
+#     external: true
+#     name: homeassistant_default  # Change to match your HA network
