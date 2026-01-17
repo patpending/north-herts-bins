@@ -1,0 +1,94 @@
+# Home Assistant Configuration Example
+# Add this to your configuration.yaml or create a package
+
+# REST Sensor for Bin Collection
+# Replace 010070035296 with your property's UPRN (find it via the web interface)
+# Replace localhost:8000 with your server's address if running elsewhere
+
+sensor:
+  # Main bin collection sensor
+  - platform: rest
+    name: "Bin Collection"
+    resource: "http://localhost:8000/api/homeassistant?uprn=010070035296"
+    method: GET
+    value_template: "{{ value_json.state }}"
+    json_attributes:
+      - days_until
+      - next_date
+      - collections
+    scan_interval: 3600  # Update every hour
+
+  # Template sensors for individual bin types (optional)
+  - platform: template
+    sensors:
+      next_bin_collection:
+        friendly_name: "Next Bin Collection"
+        value_template: "{{ state_attr('sensor.bin_collection', 'next_date') }}"
+        icon_template: >-
+          {% set bin = states('sensor.bin_collection') | lower %}
+          {% if 'recycl' in bin %}
+            mdi:recycle
+          {% elif 'refuse' in bin or 'waste' in bin %}
+            mdi:trash-can
+          {% elif 'garden' in bin %}
+            mdi:leaf
+          {% elif 'paper' in bin or 'cardboard' in bin %}
+            mdi:newspaper
+          {% else %}
+            mdi:delete
+          {% endif %}
+
+      bin_collection_days:
+        friendly_name: "Days Until Collection"
+        value_template: "{{ state_attr('sensor.bin_collection', 'days_until') }}"
+        unit_of_measurement: "days"
+        icon_template: mdi:calendar
+
+      bin_collection_today:
+        friendly_name: "Bin Collection Today"
+        value_template: "{{ state_attr('sensor.bin_collection', 'days_until') == 0 }}"
+
+# Automation example: Notify when bins need to go out
+automation:
+  - alias: "Bin Collection Reminder"
+    description: "Send notification the evening before bin collection"
+    trigger:
+      - platform: time
+        at: "18:00:00"
+    condition:
+      - condition: template
+        value_template: "{{ state_attr('sensor.bin_collection', 'days_until') == 1 }}"
+    action:
+      - service: notify.mobile_app_your_phone  # Change to your notification service
+        data:
+          title: "Bin Collection Tomorrow"
+          message: "Put out your {{ states('sensor.bin_collection') }} bin"
+          data:
+            tag: "bin-reminder"
+
+  - alias: "Bin Collection Morning Reminder"
+    description: "Morning reminder if bins are due today"
+    trigger:
+      - platform: time
+        at: "07:00:00"
+    condition:
+      - condition: template
+        value_template: "{{ state_attr('sensor.bin_collection', 'days_until') == 0 }}"
+    action:
+      - service: notify.mobile_app_your_phone
+        data:
+          title: "Bin Collection Today!"
+          message: "{{ states('sensor.bin_collection') }} collection is today"
+          data:
+            tag: "bin-reminder"
+            priority: high
+
+# Lovelace card example (add to your dashboard)
+# Copy this into a Manual card or use the Markdown card
+#
+# type: markdown
+# content: |
+#   ## Bin Collection
+#   **Next collection:** {{ states('sensor.bin_collection') }}
+#   **Date:** {{ state_attr('sensor.bin_collection', 'next_date') }}
+#   **Days until:** {{ state_attr('sensor.bin_collection', 'days_until') }}

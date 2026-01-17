@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>North Herts Bin Collection</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --success: #16a34a;
+            --warning: #ca8a04;
+            --danger: #dc2626;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-600: #4b5563;
+            --gray-800: #1f2937;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-800);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        select {
+            cursor: pointer;
+            background: white;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: var(--primary-dark);
+        }
+
+        button:disabled {
+            background: var(--gray-200);
+            cursor: not-allowed;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray-600);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid var(--gray-200);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: var(--danger);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .collection-list {
+            list-style: none;
+        }
+
+        .collection-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .collection-item:last-child {
+            border-bottom: none;
+        }
+
+        .bin-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .bin-icon.refuse { background: #374151; color: white; }
+        .bin-icon.recycling { background: #16a34a; color: white; }
+        .bin-icon.paper, .bin-icon.cardboard { background: #2563eb; color: white; }
+        .bin-icon.garden { background: #65a30d; color: white; }
+        .bin-icon.food { background: #854d0e; color: white; }
+        .bin-icon.other { background: #6b7280; color: white; }
+
+        .collection-info {
+            flex: 1;
+        }
+
+        .bin-type {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .collection-date {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+        }
+
+        .days-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .days-badge.today { background: var(--danger); color: white; }
+        .days-badge.tomorrow { background: var(--warning); color: white; }
+        .days-badge.soon { background: var(--success); color: white; }
+        .days-badge.later { background: var(--gray-200); color: var(--gray-600); }
+
+        .saved-address {
+            background: var(--gray-100);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .saved-address-text {
+            font-size: 0.9rem;
+        }
+
+        .clear-btn {
+            background: transparent;
+            color: var(--gray-600);
+            padding: 0.25rem 0.5rem;
+            width: auto;
+            font-size: 0.8rem;
+        }
+
+        .clear-btn:hover {
+            color: var(--danger);
+            background: transparent;
+        }
+
+        .uprn-display {
+            font-size: 0.8rem;
+            color: var(--gray-600);
+            margin-top: 0.5rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray-600);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Bin Collection</h1>
+            <p class="subtitle">North Hertfordshire District Council</p>
+        </header>
+
+        <!-- Saved Address Display -->
+        <div id="saved-address" class="saved-address hidden">
+            <span class="saved-address-text" id="saved-address-text"></span>
+            <button class="clear-btn" onclick="clearSavedAddress()">Change</button>
+        </div>
+
+        <!-- Search Form -->
+        <div id="search-form" class="card">
+            <div class="form-group">
+                <label for="postcode">Postcode</label>
+                <input type="text" id="postcode" placeholder="e.g. SG6 1JF" autocomplete="postal-code">
+            </div>
+
+            <button id="lookup-btn" onclick="lookupAddresses()">Find Address</button>
+
+            <!-- Address Selection -->
+            <div id="address-selection" class="form-group hidden" style="margin-top: 1rem;">
+                <label for="address-select">Select Your Address</label>
+                <select id="address-select" onchange="addressSelected()">
+                    <option value="">-- Select an address --</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <p style="margin-top: 0.5rem;">Loading collections...</p>
+        </div>
+
+        <!-- Error Display -->
+        <div id="error" class="error hidden"></div>
+
+        <!-- Results -->
+        <div id="results" class="card hidden">
+            <h2 style="margin-bottom: 1rem; font-size: 1.1rem;">Upcoming Collections</h2>
+            <ul id="collection-list" class="collection-list"></ul>
+            <p id="uprn-display" class="uprn-display"></p>
+        </div>
+    </div>
+
+    <footer>
+        <p>Data from North Herts Council</p>
+        <p style="margin-top: 0.5rem;">
+            <a href="/docs" target="_blank">API Documentation</a>
+        </p>
+    </footer>
+
+    <script>
+        const API_BASE = '/api';
+
+        // Default address (hardcoded)
+        const DEFAULT_ADDRESS = {
+            uprn: '010070035296',
+            address: 'The Dell Barn, Tile Kiln Farm, Weston Road, Hitchin, Hertfordshire SG4 7BS'
+        };
+
+        // Check for saved UPRN on load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Auto-load default address
+            showSavedAddress(DEFAULT_ADDRESS.address);
+            loadCollections(DEFAULT_ADDRESS.uprn);
+
+            // Enter key on postcode input
+            document.getElementById('postcode').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') lookupAddresses();
+            });
+        });
+
+        function showSavedAddress(address) {
+            document.getElementById('saved-address-text').textContent = address;
+            document.getElementById('saved-address').classList.remove('hidden');
+            document.getElementById('search-form').classList.add('hidden');
+        }
+
+        function clearSavedAddress() {
+            document.getElementById('saved-address').classList.add('hidden');
+            document.getElementById('search-form').classList.remove('hidden');
+            document.getElementById('results').classList.add('hidden');
+            document.getElementById('address-selection').classList.add('hidden');
+            document.getElementById('postcode').value = '';
+        }
+
+        function resetToDefault() {
+            showSavedAddress(DEFAULT_ADDRESS.address);
+            loadCollections(DEFAULT_ADDRESS.uprn);
+        }
+
+        async function lookupAddresses() {
+            const postcode = document.getElementById('postcode').value.trim();
+            if (!postcode) return;
+
+            hideError();
+            document.getElementById('lookup-btn').disabled = true;
+            document.getElementById('lookup-btn').textContent = 'Searching...';
+
+            try {
+                const response = await fetch(`${API_BASE}/addresses?postcode=${encodeURIComponent(postcode)}`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Failed to lookup addresses');
+                }
+
+                if (data.length === 0) {
+                    throw new Error('No addresses found for this postcode');
+                }
+
+                // Populate address dropdown
+                const select = document.getElementById('address-select');
+                select.innerHTML = '<option value="">-- Select an address --</option>';
+                data.forEach(addr => {
+                    const option = document.createElement('option');
+                    option.value = JSON.stringify({ uprn: addr.uprn, address: addr.address });
+                    option.textContent = addr.address;
+                    select.appendChild(option);
+                });
+
+                document.getElementById('address-selection').classList.remove('hidden');
+
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                document.getElementById('lookup-btn').disabled = false;
+                document.getElementById('lookup-btn').textContent = 'Find Address';
+            }
+        }
+
+        function addressSelected() {
+            const select = document.getElementById('address-select');
+            if (!select.value) return;
+
+            const { uprn, address } = JSON.parse(select.value);
+
+            // Save to localStorage
+            localStorage.setItem('nhBins', JSON.stringify({ uprn, address }));
+
+            showSavedAddress(address);
+            loadCollections(uprn);
+        }
+
+        async function loadCollections(uprn) {
+            hideError();
+            document.getElementById('results').classList.add('hidden');
+            document.getElementById('loading').classList.remove('hidden');
+
+            try {
+                const response = await fetch(`${API_BASE}/collections?uprn=${encodeURIComponent(uprn)}`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Failed to load collections');
+                }
+
+                renderCollections(data.collections, uprn);
+
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                document.getElementById('loading').classList.add('hidden');
+            }
+        }
+
+        function renderCollections(collections, uprn) {
+            const list = document.getElementById('collection-list');
+            list.innerHTML = '';
+
+            // Filter to future collections only and limit to next 6
+            const now = new Date();
+            const futureCollections = collections
+                .filter(c => new Date(c.collection_date) >= now)
+                .slice(0, 6);
+
+            if (futureCollections.length === 0) {
+                list.innerHTML = '<li class="collection-item">No upcoming collections found</li>';
+            } else {
+                futureCollections.forEach(c => {
+                    const li = document.createElement('li');
+                    li.className = 'collection-item';
+                    li.innerHTML = `
+                        <div class="bin-icon ${getBinClass(c.bin_type)}">${getBinEmoji(c.bin_type)}</div>
+                        <div class="collection-info">
+                            <div class="bin-type">${c.bin_type}</div>
+                            <div class="collection-date">${c.collection_date_formatted}</div>
+                        </div>
+                        <span class="days-badge ${getDaysBadgeClass(c.days_until)}">${getDaysText(c.days_until)}</span>
+                    `;
+                    list.appendChild(li);
+                });
+            }
+
+            document.getElementById('uprn-display').textContent = `UPRN: ${uprn}`;
+            document.getElementById('results').classList.remove('hidden');
+        }
+
+        function getBinClass(type) {
+            const t = type.toLowerCase();
+            if (t.includes('recycl')) return 'recycling';
+            if (t.includes('refuse') || t.includes('waste') || t.includes('residual')) return 'refuse';
+            if (t.includes('paper') || t.includes('cardboard')) return 'paper';
+            if (t.includes('garden')) return 'garden';
+            if (t.includes('food')) return 'food';
+            return 'other';
+        }
+
+        function getBinEmoji(type) {
+            const t = type.toLowerCase();
+            if (t.includes('recycl')) return '♻️';
+            if (t.includes('refuse') || t.includes('waste') || t.includes('residual')) return '🗑️';
+            if (t.includes('paper') || t.includes('cardboard')) return '📦';
+            if (t.includes('garden')) return '🌿';
+            if (t.includes('food')) return '🍎';
+            return '🗑️';
+        }
+
+        function getDaysBadgeClass(days) {
+            if (days === 0) return 'today';
+            if (days === 1) return 'tomorrow';
+            if (days <= 3) return 'soon';
+            return 'later';
+        }
+
+        function getDaysText(days) {
+            if (days === 0) return 'Today';
+            if (days === 1) return 'Tomorrow';
+            return `${days} days`;
+        }
+
+        function showError(message) {
+            const el = document.getElementById('error');
+            el.textContent = message;
+            el.classList.remove('hidden');
+        }
+
+        function hideError() {
+            document.getElementById('error').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
