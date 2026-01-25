@@ -235,7 +235,7 @@ async def homeassistant_sensor(
     sensor:
       - platform: rest
         name: "Bin Collection"
-        resource: "http://localhost:8000/api/homeassistant?uprn=YOUR_UPRN"
+        resource: "http://local-north-herts-bins:8000/api/homeassistant?uprn=YOUR_UPRN"
         value_template: "{{ value_json.state }}"
         json_attributes:
           - days_until
@@ -302,7 +302,7 @@ async def next_collection_sensor(
     sensor:
       - platform: rest
         name: "Next Bin"
-        resource: "http://localhost:8000/api/sensor/next?uprn=010070035296"
+        resource: "http://local-north-herts-bins:8000/api/sensor/next?uprn=010070035296"
         value_template: "{{ value_json.state }}"
         json_attributes:
           - days

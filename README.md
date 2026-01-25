@@ -74,7 +74,7 @@ Once the add-on is running, add these sensors to your `configuration.yaml`:
 sensor:
   - platform: rest
     name: "Next Bin"
-    resource: "http://homeassistant.local:8000/api/sensor/next?uprn=010070035296"
+    resource: "http://local-north-herts-bins:8000/api/sensor/next?uprn=010070035296"
     value_template: "{{ value_json.state }}"
     json_attributes:
       - days
@@ -82,7 +82,7 @@ sensor:
     scan_interval: 3600
 ```
 
-**Note:** Replace `homeassistant.local` with your HA hostname/IP if needed.
+**Note:** The hostname `local-north-herts-bins` is the internal add-on hostname that works reliably within Home Assistant. If this doesn't work, try your HA IP address (e.g., `http://192.168.0.6:8000/...`).
 
 ### Template Sensors
 
@@ -193,8 +193,9 @@ north-herts-bins/
 
 ### Sensor shows "unavailable"
 - Ensure the add-on is running
-- Check the URL is accessible: `curl http://homeassistant.local:8000/api/health`
-- Try using the IP address instead of hostname
+- Use the internal hostname `local-north-herts-bins` in your sensor configuration
+- Check the URL is accessible from HA: `curl http://local-north-herts-bins:8000/api/health`
+- If internal hostname doesn't work, try your HA IP address instead
 
 ### Wrong bin data
 - The data comes from North Herts Council's API
